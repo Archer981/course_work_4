@@ -1,14 +1,31 @@
-import hashlib
-import base64
-from constants import HASH_ALGO, PWD_HASH_SALT, PWD_HASH_ITERATIONS
+from flask import request, abort
+import jwt
+from constants import SECRET, JWT_ALGO
 
 
-def get_hash(password):
-    return base64.b64encode(
-        hashlib.pbkdf2_hmac(
-            HASH_ALGO,
-            password.encode('utf-8'),
-            PWD_HASH_SALT,
-            PWD_HASH_ITERATIONS
-        )
-    )
+def auth_required(func):
+    def wrapper(*args, **kwargs):
+        get_token()
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def admin_required(func):
+    def wrapper(*args, **kwargs):
+        data = get_token()
+        if data['role'] != 'admin':
+            abort(401)
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def get_token():
+    if 'Authorization' not in request.headers:
+        abort(401)
+    data = request.headers['Authorization']
+    token = data.split('Bearer ')[-1]
+    try:
+        decoded_token = jwt.decode(token, SECRET, algorithms=[JWT_ALGO])
+    except:
+        abort(401)
+    return decoded_token

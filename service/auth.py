@@ -16,11 +16,14 @@ class AuthService:
         username = user_data.get('username')
         password = user_data.get('password')
         if not username or not password:
+            print('No data')
             return 401
         user_data = self.dao.get_one(username)
         if not user_data:
+            print('No user')
             return 401
         if not self.password_compare(password, user_data.password):
+            print('Incorrect password')
             return 401
         return self.get_tokens({'username': username, 'role': user_data.role})
 
@@ -37,10 +40,12 @@ class AuthService:
         }
 
     def refresh_token_verification(self, old_refresh_token):
+        if not old_refresh_token:
+            return '', 401
         try:
             token_data = jwt.decode(old_refresh_token, SECRET, algorithms=[JWT_ALGO])
         except:
-            return '', 400
+            return '', 401
         return self.get_tokens(token_data)
 
     def password_compare(self, password, user_password):
