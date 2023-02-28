@@ -22,9 +22,6 @@ class DirectorDAO:
         self.session.delete(director)
         self.session.commit()
 
-    def update(self, director_d):
-        director = self.get_one(director_d.get("id"))
-        director.name = director_d.get("name")
-
+    def update(self, director):
         self.session.add(director)
         self.session.commit()
