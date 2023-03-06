@@ -5,13 +5,17 @@ from setup_db import db
 
 class User(db.Model):
     __tablename__ = 'user'
-    id = db.Column(db.Integer(), primary_key=True)
-    username = db.Column(db.String(100))
-    password = db.Column(db.String(100))
-    role = db.Column(db.String(50))
+    pk = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(50))
+    surname = db.Column(db.String(50))
+    favorite_genre = db.Column(db.Integer())
 
 class UserSchema(Schema):
-    id = fields.Integer()
-    username = fields.String()
+    pk = fields.Integer()
+    email = fields.String()
     password = fields.String()
-    role = fields.String()
+    name = fields.String()
+    surname = fields.String()
+    favorite_genre = fields.Integer()
