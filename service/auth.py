@@ -14,16 +14,16 @@ class AuthService:
         self.dao = dao
 
     def user_authorization(self, user_data):
-        username = user_data.get('username')
+        email = user_data.get('email')
         password = user_data.get('password')
-        if not username or not password:
+        if not email or not password:
             abort(401)
-        user_data = self.dao.get_one(username)
+        user_data = self.dao.get_one(email)
         if not user_data:
             abort(401)
         if not self.password_compare(password, user_data.password):
             abort(401)
-        return self.get_tokens({'username': username, 'role': user_data.role})
+        return self.get_tokens({'email': email})
 
     def get_tokens(self, token_data):
         min30 = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
@@ -37,10 +37,13 @@ class AuthService:
             'refresh_token': refresh_token
         }
 
-    def refresh_token_verification(self, old_refresh_token):
+    def tokens_verification(self, old_access_token, old_refresh_token):
         if not old_refresh_token:
             abort(401)
+        elif not old_access_token:
+            abort(401)
         try:
+            token_data = jwt.decode(old_access_token, SECRET, algorithms=[JWT_ALGO])
             token_data = jwt.decode(old_refresh_token, SECRET, algorithms=[JWT_ALGO])
         except:
             abort(401)
