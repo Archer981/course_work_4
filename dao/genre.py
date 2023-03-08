@@ -1,3 +1,4 @@
+from flask import current_app
 from dao.model.genre import Genre
 
 
@@ -9,7 +10,7 @@ class GenreDAO:
         return self.session.query(Genre).get(bid)
 
     def get_all(self):
-        return self.session.query(Genre).all()
+        return self.session.query(Genre).paginate(page=1, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
 
     def create(self, genre_d):
         ent = Genre(**genre_d)

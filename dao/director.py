@@ -1,3 +1,4 @@
+from flask import current_app
 from dao.model.director import Director
 
 
@@ -9,7 +10,7 @@ class DirectorDAO:
         return self.session.query(Director).get(bid)
 
     def get_all(self):
-        return self.session.query(Director).all()
+        return self.session.query(Director).paginate(page=1, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
 
     def create(self, director_d):
         ent = Director(**director_d)
