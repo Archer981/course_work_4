@@ -4,9 +4,9 @@ from constants import SECRET, JWT_ALGO
 
 
 def auth_required(func):
-    def wrapper(*args, **kwargs):
-        get_token()
-        return func(*args, **kwargs)
+    def wrapper(self, *args, **kwargs):
+        email = get_token()['email']
+        return func(self, email, *args, **kwargs)
     return wrapper
 
 

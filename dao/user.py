@@ -23,9 +23,15 @@ class UserDAO:
         self.session.commit()
 
     def update(self, user_d):
-        user = self.get_one(user_d.get("id"))
-        user.username = user.get("username", user.username)
-        user.password = user.get('password', user.password)
-        user.role = user.get('role', user.role)
+        user = self.get_one(user_d.get("email"))
+        user.name = user_d.get("name", user.name)
+        user.surname = user_d.get('surname', user.surname)
+        user.favorite_genre = user_d.get('favorite_genre', user.favorite_genre)
+        self.session.add(user)
+        self.session.commit()
+
+    def update_password(self, user_d):
+        user = self.get_one(user_d.get("email"))
+        user.password = user_d.get("password_2", user.password)
         self.session.add(user)
         self.session.commit()

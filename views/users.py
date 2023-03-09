@@ -3,35 +3,35 @@ from flask_restx import Resource, Namespace
 
 from dao.model.user import UserSchema
 from implemented import user_service
+from utils import auth_required
 
-user_ns = Namespace('users')
+user_ns = Namespace('user')
 
 
 @user_ns.route('/')
-class UsersView(Resource):
-    def get(self):
-        rs = user_service.get_all()
-        res = UserSchema(many=True).dump(rs)
-        return res, 200
-
-    def post(self):
-        user_d = request.json
-        user_service.create(user_d)
-        return '', 201
-
-
-@user_ns.route('/<int:uid>')
 class UserView(Resource):
-    def get(self, uid):
-        r = user_service.get_one(uid)
-        sm_d = UserSchema().dump(r)
-        return sm_d, 200
+    @auth_required
+    def get(self, email):
+        user = user_service.get_one(email)
+        result = UserSchema().dump(user)
+        del result['password']
+        return result, 200
 
-    def put(self, uid):
+    @auth_required
+    def patch(self, email):
         req_json = request.json
-        if "id" not in req_json:
-            req_json["id"] = uid
+        req_json['email'] = email
         user_service.update(req_json)
+        return '', 204
+
+
+@user_ns.route('/password/')
+class UserPasswordView(Resource):
+    @auth_required
+    def put(self, email):
+        req_json = request.json
+        req_json['email'] = email
+        user_service.update_password(req_json)
         return "", 204
 
     def delete(self, uid):
